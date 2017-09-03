@@ -1,0 +1,26 @@
+galaxy_info:
+  author: Nicolas CANIART
+  description: Install's systemd units
+
+  issue_tracker_url: https://github.com/cans/systemd-unit-install/issues
+
+  license: GPLv2
+
+  min_ansible_version: 2.3  # Not test with older versions
+
+  # If this a Container Enabled role, provide the minimum Ansible Container version.
+  # min_ansible_container_version:
+
+  github_branch: master
+
+  platforms:
+  - name: Debian
+    versions:
+    - jessie
+    - stretch
+
+  galaxy_tags:
+  - 'systemd'
+  - 'unit'
+
+dependencies: []

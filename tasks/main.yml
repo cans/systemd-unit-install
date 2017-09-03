@@ -1,0 +1,49 @@
+---
+- name: Load defaults
+  include_vars:
+    file: vars/private.yml
+  register: private
+
+- name: Check all units have at least one `content` or `unit` key defined
+  fail:
+    msg: "Units to install description must contain either of a `content' or `unit' key (unit: {{item}})."
+  when: "not (item.content is defined and item.unit is defined) and (item.content is undefined and item.unit is undefined)"  # is this a valid xor ?
+  with_items: "{{systemd_unit_install_units}}"
+
+- debug:
+    var: item
+  when: "lookup('env', 'DEBUG')"
+  with_subelements:
+    # Ensures we have a `tasks' attribute on all
+    - "{{ systemd_unit_install_units|rejectattr('tasks', 'undefined')|list + systemd_unit_install_units|selectattr('tasks', 'undefined')|map('combine', private['ansible_facts']['_systemd_unit_install_unit_descriptor_defaults'])|list }}"
+    - "tasks"
+
+- name: Install Systemd Unit from target
+  template:
+    src: "{{item.0.unit|default(omit)}}"
+    content: "{{item.0.template|default(omit)}}"
+    dest: "{{item.0.directory|default(systemd_unit_install_dir) + '/' + item.0.unit|basename|splitext|first}}{% if item.1 %}@.service{% else %}.service{% endif %}"
+    remote_src: "{{item.0.remote|default(false)}}"
+  with_subelements:
+    # Ensures we have a `tasks' attribute on all
+    - "{{ systemd_unit_install_units|rejectattr('tasks', 'undefined')|list + systemd_unit_install_units|selectattr('tasks', 'undefined')|map('combine', private['ansible_facts']['_systemd_unit_install_unit_descriptor_defaults'])|list }}"
+    - "tasks"
+  become: "{{systemd_unit_install_become}}"
+  become_user: "{{systemd_unit_install_become_user}}"
+
+- name: Enable/Start Systemd Unit
+  systemd:
+    name: "{{item.0.unit|basename|splitext|first}}{% if item.1 %}@{{item.1}}.service{% else %}.service{% endif %}"
+    enabled: "{{private['ansible_facts']['_systemd_unit_install_state_map'][item.0.state|default(systemd_unit_install_state)]._enabled}}"
+    state: "{{private['ansible_facts']['_systemd_unit_install_state_map'][item.0.state|default(systemd_unit_install_state)]._state}}"
+    user: "{{item.0.user|default(systemd_unit_install_user)}}"
+    daemon_reload: true
+  with_subelements:
+    # Ensures we have a `tasks' attribute on all
+    - "{{ systemd_unit_install_units|rejectattr('tasks', 'undefined')|list + systemd_unit_install_units|selectattr('tasks', 'undefined')|map('combine', private['ansible_facts']['_systemd_unit_install_unit_descriptor_defaults'])|list }}"
+    - "tasks"
+  become: "{{systemd_unit_install_become}}"
+  become_user: "{{systemd_unit_install_become_user}}"
+
+
+# vim: et:syntax=yaml:sw=2:ts=2:

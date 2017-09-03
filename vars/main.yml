@@ -1,0 +1,4 @@
+---
+# Variables intended to be used by roles other than this one.
+systemd_unit_install_taskname: 1
+systemd_unit_install_unit: 0

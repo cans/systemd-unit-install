@@ -1,0 +1,7 @@
+---
+systemd_unit_install_dir: "/etc/systemd/system"
+systemd_unit_install_remote: false
+systemd_unit_install_state: 'enabled'
+systemd_unit_install_user: false
+systemd_unit_install_become: false
+systemd_unit_install_become_user: "root"
