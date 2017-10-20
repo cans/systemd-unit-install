@@ -1,7 +1,7 @@
 ---
 _systemd_unit_install_state_map:
   disabled:
-    _state: "{{omit}}"
+    _state: "stopped"
     _enabled: "false"
   enabled:
     _state: "stopped"
