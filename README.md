@@ -29,8 +29,7 @@ Role Variables
 - `systemd_unit_install_state`: the default state to set units in (default: 'enabled')
 - `systemd_unit_install_remote`: whether unit file are to be taken from the local or the remote host (default: False).
 - `systemd_unit_install_user`: whether units are to be installed system-wide (False) or as per-user services (True) by default (default: False).
-- `systemd_unit_install_become`: whether to use privilege escalation is needed to install the unit (default: false).
-- `systemd_unit_install_become_user`: which priviledged identity is to be assumed to get enough privileges to install the unit (default: "root")
+
 
 Dependencies
 ------------

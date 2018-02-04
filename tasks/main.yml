@@ -22,18 +22,16 @@
   template:
     src: "{{item.0.unit|default(omit)}}"
     content: "{{item.0.template|default(omit)}}"
-    dest: "{{item.0.directory|default(systemd_unit_install_dir) + '/' + item.0.unit|basename|splitext|first}}{% if item.1 %}@{{item.1}}{% endif %}.service"
+    dest: "{{item.0.directory|default(systemd_unit_install_dir) + '/' + item.0.unit|basename|splitext|first}}{% if item.1 %}@{{item.1}}{% endif %}{{item.0.unit|basename|splitext|last}}"
     remote_src: "{{item.0.remote|default(false)}}"
   with_subelements:
     # Ensures we have a `tasks' attribute on all
     - "{{ (systemd_unit_install_units|rejectattr('tasks', 'undefined')|list) + (systemd_unit_install_units|selectattr('tasks', 'undefined')|map('combine', private['ansible_facts']['_systemd_unit_install_unit_descriptor_defaults'])|list) }}"
     - "tasks"
-  become: "{{systemd_unit_install_become}}"
-  become_user: "{{systemd_unit_install_become_user}}"
 
 - name: Enable/Start Systemd Unit
   systemd:
-    name: "{{item.0.unit|basename|splitext|first}}{% if item.1 %}@{{item.1}}.service{% else %}.service{% endif %}"
+    name: "{{item.0.unit|basename|splitext|first}}{% if item.1 %}@{{item.1}}{% endif %}{{item.0.unit|basename|splitext|last}}"
     enabled: "{{private['ansible_facts']['_systemd_unit_install_state_map'][item.0.state|default(systemd_unit_install_state)]._enabled}}"
     state: "{{private['ansible_facts']['_systemd_unit_install_state_map'][item.0.state|default(systemd_unit_install_state)]._state}}"
     user: "{{item.0.user|default(systemd_unit_install_user)}}"
@@ -42,8 +40,6 @@
     # Ensures we have a `tasks' attribute on all
     - "{{ systemd_unit_install_units|rejectattr('tasks', 'undefined')|list + systemd_unit_install_units|selectattr('tasks', 'undefined')|map('combine', private['ansible_facts']['_systemd_unit_install_unit_descriptor_defaults'])|list }}"
     - "tasks"
-  become: "{{systemd_unit_install_become}}"
-  become_user: "{{systemd_unit_install_become_user}}"
 
 
 # vim: et:syntax=yaml:sw=2:ts=2:

@@ -1,0 +1,33 @@
+---
+language: python
+python: "2.7"
+
+# Use the new container infrastructure
+sudo: required
+
+# Install ansible
+addons:
+  apt:
+    packages:
+    - python-pip
+
+install:
+  # Install ansible
+  - pip install ansible "ansible-lint>=3.4.15"
+
+  # Check ansible version
+  - ansible --version
+
+  # Create ansible.cfg with correct roles_path
+  - printf '[defaults]\nroles_path=../' >ansible.cfg
+
+script:
+  # Lint the role, but we don't want this to fail the build.
+  - ansible-lint tests/test.yml || echo -n ""
+  # Basic role syntax check
+  - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+  # No test written yet.
+  # - ansible-playbook tests/test.yml -i tests/inventory --connection=local
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
